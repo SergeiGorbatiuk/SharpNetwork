@@ -23,7 +23,7 @@
         /// </summary>
         /// <param name="inputVec">Input vector.</param>
         /// <returns>Predicted value.</returns>
-        int Predict(double[] inputVec);
+        double[] Predict(double[] inputVec);
 
         /// <summary>
         ///   Configure network to have specified number of neurons in input layer.

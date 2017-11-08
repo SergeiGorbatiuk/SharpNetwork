@@ -67,9 +67,14 @@ namespace SharpNetwork
         
         
 
-        public int Predict(double[] inputVec)
+        public double[] Predict(double[] inputVec)
         {
-            throw new NotImplementedException();
+            Matrix<double> activations = Vector<double>.Build.DenseOfArray(inputVec).ToColumnMatrix();
+            for (int i = 0; i < layersCounts.Count-1; i++)
+            {
+                activations = Utils.Sigmoid(weights[i] * activations + biases[i]);
+            }
+            return activations.AsColumnMajorArray();
         }
         
         

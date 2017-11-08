@@ -14,8 +14,11 @@ namespace SharpNetwork
             NNetwork network = new NNetwork();
             network.Configure(2);
             var ex = new double[] {1, 2};
-            var answ = new double[] {0.2};
-            network.Train(ex, answ);
+            var answ = network.Predict(ex);
+            foreach (var d in answ)
+            {
+                Console.WriteLine(d);
+            }
         }
         
     }
