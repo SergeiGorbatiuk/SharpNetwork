@@ -9,16 +9,20 @@ namespace SharpNetwork
 {
     public class NNetwork : INetwork
     {
-        private int inputSize;
-        private double learningRate = 1;
+        private double learningRate = 0.1;
         private List<int> layersCounts = new List<int>();
         private List<Matrix<double>> weights = new List<Matrix<double>>();
         private List<Matrix<double>> biases = new List<Matrix<double>>();
-        
-        public void Train(double[] trainingVec, double[] expectedOutput)
+
+
+        public int InputSize { get; private set; }
+
+        public void Train(int[] trainingVec, int expectedOutput)
         {
-            Matrix<double> x = Vector<double>.Build.DenseOfArray(trainingVec).ToColumnMatrix();
-            Matrix<double> y = Vector<double>.Build.DenseOfArray(expectedOutput).ToColumnMatrix();
+            double[] input = trainingVec.Select(Convert.ToDouble).ToArray();
+            Matrix<double> x = Vector<double>.Build.DenseOfArray(input).ToColumnMatrix();
+            double[] output = {expectedOutput};
+            Matrix<double> y = Vector<double>.Build.DenseOfArray(output).ToColumnMatrix();
             List<Matrix<double>> nabla_w = new List<Matrix<double>>();
             List<Matrix<double>> nabla_b = new List<Matrix<double>>();
             List<Matrix<double>> sums = new List<Matrix<double>>();
@@ -36,6 +40,7 @@ namespace SharpNetwork
             
             /*calculating error of the output layer*/
             var fin = activations.Last();
+            Console.WriteLine("Network response: {0}", fin);
             Matrix<double> delta; 
             delta = (fin - y).PointwiseMultiply(Utils.SigmoidDerivative(sums.Last()));
             nabla_b.Insert(0, delta);
@@ -67,14 +72,16 @@ namespace SharpNetwork
         
         
 
-        public double[] Predict(double[] inputVec)
+        public int Predict(int[] inputVec)
         {
-            Matrix<double> activations = Vector<double>.Build.DenseOfArray(inputVec).ToColumnMatrix();
+            double[] input = inputVec.Select(Convert.ToDouble).ToArray();
+            Matrix<double> activations = Vector<double>.Build.DenseOfArray(input).ToColumnMatrix();
             for (int i = 0; i < layersCounts.Count-1; i++)
             {
                 activations = Utils.Sigmoid(weights[i] * activations + biases[i]);
             }
-            return activations.AsColumnMajorArray();
+            return (int)Math.Round(activations.AsColumnMajorArray()[0]);
+            /* here we guarantee, that output matrix is 1x1. Useless cumbersome int casts.*/
         }
         
         
@@ -86,7 +93,7 @@ namespace SharpNetwork
                 Console.WriteLine("Input layer must contain at least 1 unit");
                 return;
             }
-            this.inputSize = inputSize;
+            this.InputSize = inputSize;
             layersCounts.Clear();
             layersCounts.Add(inputSize);
             if (inputSize > 5)
@@ -121,7 +128,7 @@ namespace SharpNetwork
                 Console.WriteLine("Layer {0} biases", i+1);
                 Console.WriteLine(layerBiases);
             }
-            Console.WriteLine("_________________________________________");
+            Console.WriteLine("__________________ Network built successfull _______________________");
         }
     }
 }
